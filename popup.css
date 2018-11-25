@@ -1,0 +1,39 @@
+html, body {
+	#width: 1000px;
+	#height: 500px;
+	min-height: 10em;
+	width: 20em + 1px;
+}
+
+.hidden {
+	display: none;
+}
+
+.button {
+	margin: 3% auto;
+	padding: 4px;
+	text-align: center;
+	font-size: 1.5em;
+	cursor: pointer;
+}
+
+.call:hover {
+	background-color: #f63;
+	color: white;
+}
+
+.call {
+	background-color: white;
+	color: #f63;
+}
+
+.reset {
+	background-color: white;
+	color: black;
+}
+
+.reset:hover {
+	background-color: #f63;
+	color: black;
+}
+

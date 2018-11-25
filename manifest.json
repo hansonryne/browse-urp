@@ -1,0 +1,31 @@
+{    
+  "manifest_version": 2,
+  "name": "Browse-urp",   
+  "version": "1.0",    
+  "description": "A simple interface to quickly send sites to the Burp Active Scanner",    
+  "icons": {     
+    "256": "icon/burp.svg"   
+  },
+
+  "permissions": [  
+    "<all_urls>",
+    "activeTab",
+    "tabs",
+    "storage"   
+  ], 
+
+  "applications": {
+    "gecko": {
+      "id": "1234567890@example.com"
+    }
+  },
+
+  "browser_action": {
+    "default_icon": {
+      "200": "icon/burp.svg"     
+    },
+    "default_title": "Browse-urp",
+    "default_popup": "popup.html"   
+  }
+  
+}

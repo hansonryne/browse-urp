@@ -1,0 +1,39 @@
+<html>
+	<head>
+		<meta chart="utf-8">
+		<link rel="stylesheet" href="popup.css"/>
+	</head>
+	<body>
+
+		<div id="status">
+		</div>
+
+		<div id="table">
+			<table border=1>
+				<tr>
+					<th colspan=2>Burp API Info</th>
+				</tr>
+				<tr>
+					<td>API IP <input id="burp-address" type="text" value="127.0.0.1"></input></td>
+					<td>API Port <input id="burp-port" type="text" value="1337"></input></td>
+				</tr>
+				<tr>
+					<td colspan=2><div id="start-scan" class="button call">Scan This Tab</div></td>
+				</tr>
+				<tr>
+					<td colspan=2><div id="get-scan-results" class="button call">Get Scan Results</div></td>
+				</tr>
+				<tr>
+					<td colspan=2><div id="clear-storage" class="button reset">Clear Storage</div></td>
+				</tr>
+			</table>
+		</div>
+
+		<div id="results">
+		</div>
+
+
+		<script src='popup.js'>
+		</script>
+	</body>
+</html>
