@@ -8,7 +8,7 @@ Firefox browser extension for the Burp API
 * Find it on your filesystem and go
 
 ## Usage Instructions
-* Ensure the Burp Suite API is running (auth tokens are not supported yet)
+* Ensure the Burp Suite API is running (auth tokens are NOT supported yet)
 * Ensure the extension is set up with the proper IP and port for the API
 * Go to the tab with the page you want to scan
 * Click "Scan This Tab"
