@@ -3,7 +3,7 @@ Firefox browser extension for the Burp API
 
 ## Installation Instructions
 * Download and save respository
-* Go to about:debugging
+* Go to about:debugging in the FireFox URL bar
 * Click Load Temporary Add-on
 * Find it on your filesystem and go
 
