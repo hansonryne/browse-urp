@@ -17,3 +17,4 @@ Firefox browser extension for the Burp API
 ### Notes
 * "Clear Storage" only clears the browser local storage in use by the extension.  (It will not delete the actual Burp scans)
 * Notifications at the top of the extension window let you know the status of the scan.
+* DON'T SCAN THINGS YOU AREN'T SUPPOSED TO OR BLAME ME FOR IT
