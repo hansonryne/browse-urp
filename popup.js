@@ -1,7 +1,7 @@
 // Send GET request to REST API for either scan results or issues list.
-function httpGet(theUrl)
-{
+function httpGet(theUrl) {
   var xmlHttp = new XMLHttpRequest();
+
   xmlHttp.onreadystatechange = function() {
     if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
       resText = JSON.parse(xmlHttp.responseText);
@@ -12,28 +12,29 @@ function httpGet(theUrl)
       }
     }
   }
-  xmlHttp.open( "GET", theUrl, true ); // false for synchronous request
+
+  xmlHttp.open( "GET", theUrl, true );
   xmlHttp.send( null );
 }
 
 
-// Set POST request to REST API in order to start Burp scan.
-function httpPost(theUrl, target)
-{
+// Send POST request to REST API in order to start Burp scan.
+function httpPost(theUrl, target) {
   var xmlHttp = new XMLHttpRequest();
+
   xmlHttp.onreadystatechange = function() {
     if (xmlHttp.readyState == 4 && xmlHttp.status == 201) {
       // Save scan ID to local storage for accessing later
-      let res = xmlHttp.getResponseHeader("Location");
+      let scanId = xmlHttp.getResponseHeader("Location");
       burpAddress = document.getElementById("burp-address").value;
       burpPort = document.getElementById("burp-port").value;
-      browser.storage.local.set({[target]: res}).then(() => {
+      browser.storage.local.set({[target]: scanId}).then(() => {
         console.log("saved");
       });
-      httpGet(`http://${burpAddress}:${burpPort}/v0.1/scan/${res}`);
+      httpGet(`http://${burpAddress}:${burpPort}/v0.1/scan/${scanId}`);
     }
   }
-  xmlHttp.open( "POST", theUrl, true ); // false for synchronous request
+  xmlHttp.open( "POST", theUrl, true );
   xmlHttp.setRequestHeader('Content-Type', 'application/json');
   xmlHttp.send( JSON.stringify ({
     "scope":{"include":[{"rule":target,"type":"SimpleScopeDef"}]},
@@ -45,7 +46,7 @@ function buildPage(data) {
   res = data;
   for (x in res) {
     let element = document.createElement("div");
-    element.id = `test_ele ${x}`;
+    element.id = `issue_#${x}`;
     element.innerText = "Issue Type: ";
     document.body.appendChild(element);
     sub = document.createElement("div");
@@ -59,7 +60,7 @@ function startScan(url, target) {
 }
 
 function compileResults(scanData) {
-  let paths = {}; 
+  let paths = {};
 
   scanData.issue_events.forEach((issue_found) => {
     paths[issue_found.issue.path] = {};
@@ -103,60 +104,16 @@ function populateResults(data) {
   res = data;
 
   if (res["scan_status"] === "initializing" || res["scan_status"] === "crawling" || res["scan_status"] === "auditing") {
-    let stat = "Scan is still running"
+    let stat = "<h2>Scan is still running</h2>"
     document.getElementById("status").innerHTML = stat;
-
   } else {
-    let stat = "Scan is finished"
+    let stat = "<h2>Scan is finished</h2>"
     document.getElementById("status").innerHTML = stat;
   }
+
   txt = compileResults(res)
   table = "<table border=1>" + txt + "</table>"
   document.getElementById("results").innerHTML = table;
-
-  /*let txt = ""
-  if (res["scan_status"] === "initializing" || res["scan_status"] === "crawling" || res["scan_status"] === "auditing") {
-    let stat = "Scan is still running"
-    document.getElementById("status").innerHTML = stat;
-    txt += "<table border='1'>"
-    res.issue_events.forEach((item) => {
-      Object.entries(item).forEach(([key, val]) => {
-        if (key === "issue") {
-          Object.entries(val).forEach(([k, v]) => {
-            txt += "<tr>"
-            if (k === "name") {
-              txt += "<td>Issue Detected:</td><td>" + `${JSON.stringify(v)}` + "</td>";
-            }
-            if (k === "path") {
-              txt += "<td>Path</td><td>" + `${JSON.stringify(v)}` + "</td>"
-            }
-            txt += "</tr>"
-          });
-        }
-      });
-    });
-    txt += "</table>"
-    document.getElementById("results").innerHTML = txt;
-  } else {
-    let stat = "Scan is finished"
-    document.getElementById("status").innerHTML = stat;
-    txt += "<table border='1'>"
-    res.issue_events.forEach((item) => {
-      Object.entries(item).forEach(([key, val]) => {
-        if (key === "issue") {
-          Object.entries(val).forEach(([k, v]) => {
-            if (k === "name") {
-              txt += "<tr><td>" + `${k}:` + "</td><td>" + `${JSON.stringify(v)}` + "</td></tr>";
-            }
-          });
-        }
-      });
-    });
-    txt += "</table>"
-    document.getElementById("results").innerHTML = txt;
-  }
-  */
-
 }
 
 function onGotIds(item) {
@@ -182,12 +139,6 @@ document.addEventListener("click", (e) => {
   burpAddress = document.getElementById("burp-address").value;
   burpPort = document.getElementById("burp-port").value;
 
-  if (e.target.id === "get-issues") {
-    gettingActiveTab.then((tabs) => {
-      httpGet(`http://${burpAddress}:${burpPort}/v0.1/knowledge_base/issue_definitions`)
-    });
-  }
-
   if (e.target.id === "start-scan") {
     gettingActiveTab.then((tabs) => {
       targetAddress = tabs[0].url
@@ -195,8 +146,8 @@ document.addEventListener("click", (e) => {
     });
   }
 
-  if (e.target.id === "get-scan-id") {
-    gettingScanIds.then(onGotIds);
+  if (e.target.id === "get-scan-results") {
+    gettingScanIds.then(getScanData);
   }
 
   if (e.target.id === "clear-storage") {
@@ -204,8 +155,14 @@ document.addEventListener("click", (e) => {
     clearingStorage.then(() => console.log("cleared"));
   }
 
-  if (e.target.id === "get-scan-results") {
-    gettingScanIds.then(getScanData);
+  if (e.target.id === "get-issues") {
+    gettingActiveTab.then((tabs) => {
+      httpGet(`http://${burpAddress}:${burpPort}/v0.1/knowledge_base/issue_definitions`)
+    });
+  }
+
+  if (e.target.id === "get-scan-id") {
+    gettingScanIds.then(onGotIds);
   }
 
 });

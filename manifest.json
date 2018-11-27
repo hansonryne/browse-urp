@@ -1,18 +1,18 @@
-{    
+{
   "manifest_version": 2,
-  "name": "Browse-urp",   
-  "version": "1.0",    
-  "description": "A simple interface to quickly send sites to the Burp Active Scanner",    
-  "icons": {     
-    "256": "icon/burp.svg"   
+  "name": "Browse-urp",
+  "version": "1.0",
+  "description": "A simple interface to quickly send sites to the Burp Active Scanner",
+  "icons": {
+    "256": "icon/burp.svg"
   },
 
-  "permissions": [  
+  "permissions": [
     "<all_urls>",
     "activeTab",
     "tabs",
-    "storage"   
-  ], 
+    "storage"
+  ],
 
   "applications": {
     "gecko": {
@@ -22,10 +22,10 @@
 
   "browser_action": {
     "default_icon": {
-      "200": "icon/burp.svg"     
+      "200": "icon/burp.svg"
     },
     "default_title": "Browse-urp",
-    "default_popup": "popup.html"   
+    "default_popup": "popup.html"
   }
-  
+
 }
