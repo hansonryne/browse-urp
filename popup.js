@@ -1,15 +1,11 @@
 // Send GET request to REST API for either scan results or issues list.
-function httpGet(theUrl) {
+function getResults(theUrl) {
   var xmlHttp = new XMLHttpRequest();
 
   xmlHttp.onreadystatechange = function() {
     if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
       resText = JSON.parse(xmlHttp.responseText);
-      if (resText.hasOwnProperty("scan_status")) {
-        populateResults(resText);
-      } else {
-        buildPage(resText);
-      }
+      populateResults(resText);
     }
   }
 
@@ -19,7 +15,7 @@ function httpGet(theUrl) {
 
 
 // Send POST request to REST API in order to start Burp scan.
-function httpPost(theUrl, target) {
+function startScan(theUrl, target) {
   var xmlHttp = new XMLHttpRequest();
 
   xmlHttp.onreadystatechange = function() {
@@ -29,9 +25,8 @@ function httpPost(theUrl, target) {
       burpAddress = document.getElementById("burp-address").value;
       burpPort = document.getElementById("burp-port").value;
       browser.storage.local.set({[target]: scanId}).then(() => {
-        console.log("saved");
+		document.getElementById('status').innerHTML = "<h3>Scan started</h3>";
       });
-      httpGet(`http://${burpAddress}:${burpPort}/v0.1/scan/${scanId}`);
     }
   }
   xmlHttp.open( "POST", theUrl, true );
@@ -40,23 +35,6 @@ function httpPost(theUrl, target) {
     "scope":{"include":[{"rule":target,"type":"SimpleScopeDef"}]},
     "urls":[target]
   }));
-}
-
-function buildPage(data) {
-  res = data;
-  for (x in res) {
-    let element = document.createElement("div");
-    element.id = `issue_#${x}`;
-    element.innerText = "Issue Type: ";
-    document.body.appendChild(element);
-    sub = document.createElement("div");
-    sub.innerHTML = res[x].description;
-    document.getElementById(`test_ele ${x}`).appendChild(sub);
-  }
-}
-
-function startScan(url, target) {
-  res = httpPost(url, target);
 }
 
 function compileResults(scanData) {
@@ -78,7 +56,6 @@ function compileResults(scanData) {
     });
   });
 
-  console.log(paths);
 
   let txt = ""
   Object.entries(paths).forEach((path) => {
@@ -95,7 +72,6 @@ function compileResults(scanData) {
     });
   });
 
-  console.log(txt);
   return txt;
 
 }
@@ -104,10 +80,10 @@ function populateResults(data) {
   res = data;
 
   if (res["scan_status"] === "initializing" || res["scan_status"] === "crawling" || res["scan_status"] === "auditing") {
-    let stat = "<h2>Scan is still running</h2>"
+    let stat = "<h3>Scan is still running</h3>"
     document.getElementById("status").innerHTML = stat;
   } else {
-    let stat = "<h2>Scan is finished</h2>"
+    let stat = "<h3>Scan is finished</h3>"
     document.getElementById("status").innerHTML = stat;
   }
 
@@ -116,53 +92,36 @@ function populateResults(data) {
   document.getElementById("results").innerHTML = table;
 }
 
-function onGotIds(item) {
-  console.log(item);
-}
-
 function getScanData(item) {
   let gettingActiveTab = browser.tabs.query({active: true, currentWindow: true});
   gettingActiveTab.then((tabs) => {
     burpAddress = document.getElementById("burp-address").value;
     burpPort = document.getElementById("burp-port").value;
     targetAddress = tabs[0].url
-    console.log("ITEM");
-    console.log(item);
-    httpGet(`http://${burpAddress}:${burpPort}/v0.1/scan/${item[targetAddress]}`)
+    getResults(`http://${burpAddress}:${burpPort}/v0.1/scan/${item[targetAddress]}`)
   });
 }
 
 document.addEventListener("click", (e) => {
 
-  let gettingActiveTab = browser.tabs.query({active: true, currentWindow: true});
-  let gettingScanIds = browser.storage.local.get(null);
-  burpAddress = document.getElementById("burp-address").value;
-  burpPort = document.getElementById("burp-port").value;
-
   if (e.target.id === "start-scan") {
+    let gettingActiveTab = browser.tabs.query({active: true, currentWindow: true});
     gettingActiveTab.then((tabs) => {
       targetAddress = tabs[0].url
+	  burpAddress = document.getElementById("burp-address").value;
+	  burpPort = document.getElementById("burp-port").value;
       startScan(`http://${burpAddress}:${burpPort}/v0.1/scan`, targetAddress)
     });
   }
 
   if (e.target.id === "get-scan-results") {
+    let gettingScanIds = browser.storage.local.get(null);
     gettingScanIds.then(getScanData);
   }
 
   if (e.target.id === "clear-storage") {
     let clearingStorage = browser.storage.local.clear();
-    clearingStorage.then(() => console.log("cleared"));
-  }
-
-  if (e.target.id === "get-issues") {
-    gettingActiveTab.then((tabs) => {
-      httpGet(`http://${burpAddress}:${burpPort}/v0.1/knowledge_base/issue_definitions`)
-    });
-  }
-
-  if (e.target.id === "get-scan-id") {
-    gettingScanIds.then(onGotIds);
+    clearingStorage.then(() => document.getElementById('status').innerHTML = "<h3>Cleared Local Storage</h3>");
   }
 
 });
