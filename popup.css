@@ -5,10 +5,6 @@ html, body {
 	width: 20em + 1px;
 }
 
-.hidden {
-	display: none;
-}
-
 .button {
 	margin: 3% auto;
 	padding: 4px;
